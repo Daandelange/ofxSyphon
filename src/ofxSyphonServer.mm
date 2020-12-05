@@ -8,11 +8,7 @@
  */
 
 #include "ofxSyphonServer.h"
-#ifdef OFXSYPHON_ALTERNATIVE_SYPHON_INCLUDE
-#import "Syphon.h"
-#else
 #import <Syphon/Syphon.h>
-#endif
 
 ofxSyphonServer::ofxSyphonServer()
 {

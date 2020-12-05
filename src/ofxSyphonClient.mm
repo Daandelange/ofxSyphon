@@ -8,11 +8,7 @@
  */
 
 #include "ofxSyphonClient.h"
-#ifdef OFXSYPHON_ALTERNATIVE_SYPHON_INCLUDE
-#import "Syphon.h"
-#else
 #import <Syphon/Syphon.h>
-#endif
 #import "SyphonNameboundClient.h"
 
 ofxSyphonClient::ofxSyphonClient() :
