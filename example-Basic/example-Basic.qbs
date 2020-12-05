@@ -18,7 +18,7 @@ Project{
         ]
 
         of.addons: [
-            'ofxSyphon',
+
         ]
 
         // additional flags for the project. the of module sets some
@@ -29,31 +29,21 @@ Project{
         of.cFlags: []           // flags passed to the c compiler
         of.cxxFlags: []         // flags passed to the c++ compiler
         of.linkerFlags: []      // flags passed to the linker
-        of.defines: [           // defines are passed as -D to the compiler
-            'OFXSYPHON_ALTERNATIVE_SYPHON_INCLUDE', // Fixes #include search paths
-        ]
+        of.defines: []          // defines are passed as -D to the compiler
                                 // and can be checked with #ifdef or #if in the code
         of.frameworks: []       // osx only, additional frameworks to link with the project
         of.staticLibraries: []  // static libraries
         of.dynamicLibraries: [] // dynamic libraries
 
-        // include ofxSyphon on osx
+        // Include ofxSyphon on osx
         Properties {
             // osx only, additional frameworks to link with the project
             condition: qbs.targetOS.contains("osx") || qbs.targetOS.contains("macos")
-            // Add Syphon support
             of.addons: outer.concat(['ofxSyphon'])
             of.frameworks: outer.concat(['Syphon'])
-            of.linkerFlags: outer.concat([
-                '-F'+Helpers.normalize(FileInfo.joinPaths(project.sourceDirectory,'../../../addons/ofxSyphon/libs/Syphon/lib/osx/')),
-            ])
-        }
-        // dirty fix for compiling .mm files (not auto-detected on qt)
-        Group {
-            name: 'Missing Syphon Files'
-            // osx only, additional frameworks to link with the project
-            condition: qbs.targetOS.contains("osx") || qbs.targetOS.contains("macos")
-            files: base.concat([
+            cpp.frameworkPaths: ['../../../addons/ofxSyphon/libs/Syphon/lib/osx/']
+            // dirty fix for compiling .mm files (not auto-detected on qt)
+            files: outer.concat([
                 '../../../addons/ofxSyphon/src/ofxSyphonClient.mm',
                 '../../../addons/ofxSyphon/src/ofxSyphonServer.mm',
                 '../../../addons/ofxSyphon/src/ofxSyphonServerDirectory.mm',
