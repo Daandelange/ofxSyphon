@@ -28,8 +28,9 @@ class ofxSyphonClient {
     const std::string& getApplicationName();
     const std::string& getServerName();
   
-    void bind();
-    void unbind();
+    // Returns true if the texture is available
+    bool bind(); // Note: Needs retro-compatibility with previous`void bind()`
+    bool unbind();
     
     /*
      To use the texture with getTexture()
@@ -46,6 +47,7 @@ class ofxSyphonClient {
 	
 	float getWidth();
 	float getHeight();
+	bool isNewFrame();
     
 	protected:
 	ofxSyphonNSObject mClient;
@@ -53,5 +55,6 @@ class ofxSyphonClient {
 	ofTexture mTex;
 	int width, height;
 	bool bSetup;
+	bool bHasNewFrame;
     std::string appName, serverName;
 };

@@ -23,6 +23,7 @@ void ofxSyphonClient::setup()
         mClient = ofxSNOMake([[SyphonNameboundClient alloc] initWithContext:CGLGetCurrentContext()]);
     }
 	bSetup = true;
+	bHasNewFrame = false;
 }
 
 bool ofxSyphonClient::isSetup(){
@@ -114,7 +115,7 @@ const std::string& ofxSyphonClient::getServerName(){
     return serverName;
 }
 
-void ofxSyphonClient::bind()
+bool ofxSyphonClient::bind()
 {
     if(bSetup)
     {
@@ -122,6 +123,10 @@ void ofxSyphonClient::bind()
             [(SyphonNameboundClient*)ofxSNOGet(mClient) lockClient];
            SyphonOpenGLClient *client = [(SyphonNameboundClient*)ofxSNOGet(mClient) client];
            
+            if(client!=nullptr)
+                bHasNewFrame = [client newFrameImage];
+
+            // Fixme: Maybe below we can skip getting the new texture is it's unchanged ?
            ofxSNOSet(latestImage, [client newFrameImage]);
            NSSize texSize = [(SyphonOpenGLImage*)ofxSNOGet(latestImage) textureSize];
            
@@ -144,12 +149,15 @@ void ofxSyphonClient::bind()
            
            mTex.bind();
         }
+        return true;
     }
     else
 		cout<<"ofxSyphonClient is not setup, or is not properly connected to server.  Cannot bind.\n";
+
+	return false;
 }
 
-void ofxSyphonClient::unbind()
+bool ofxSyphonClient::unbind()
 {
     if(bSetup)
     {
@@ -158,9 +166,12 @@ void ofxSyphonClient::unbind()
             [(SyphonNameboundClient*)ofxSNOGet(mClient) unlockClient];
             latestImage = ofxSyphonNSObject();
         }
+        return true;
     }
     else
 		cout<<"ofxSyphonClient is not setup, or is not properly connected to server.  Cannot unbind.\n";
+
+	return false;
 }
 
 void ofxSyphonClient::draw(float x, float y, float w, float h)
@@ -199,6 +210,11 @@ float ofxSyphonClient::getWidth()
 float ofxSyphonClient::getHeight()
 {
 	return mTex.texData.height;
+}
+
+bool ofxSyphonClient::isNewFrame()
+{
+	return bHasNewFrame;
 }
 
 
