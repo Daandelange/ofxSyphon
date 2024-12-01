@@ -35,17 +35,20 @@ class ofxSyphonClient {
 
     float getWidth() const;
     float getHeight() const;
+    bool isNewFrame() const;
 
     // check return from lockTexture() before proceeding, returns false is the client has no texture
     bool lockTexture();
-    void unlockTexture();
+    // Returns false if failed to unlock (rare)
+    bool unlockTexture();
     
+    // Returns true if the texture is available
     // calls lockTexture() then getTexture().bind()
     [[deprecated("Use getTexture().bind()")]]
-    void bind();
+    bool bind();
     // calls getTexture().unbind() then unlockTexture()
     [[deprecated("Use getTexture().unbind()")]]
-    void unbind();
+    bool unbind();
     
     /*
      To use the texture with getTexture()
@@ -59,5 +62,6 @@ class ofxSyphonClient {
     ofxSyphonNSObject latestImage;
 	ofTexture mTex;
 	bool bSetup = false;
+	bool bHasNewFrame;
     std::string appName, serverName;
 };

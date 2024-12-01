@@ -22,6 +22,7 @@ void ofxSyphonClient::setup()
         mClient = ofxSNOMake([[SyphonNameboundClient alloc] initWithContext:CGLGetCurrentContext()]);
     }
 	bSetup = true;
+	bHasNewFrame = false;
 }
 
 bool ofxSyphonClient::isSetup() const
@@ -125,7 +126,8 @@ bool ofxSyphonClient::lockTexture()
         @autoreleasepool {
             [(SyphonNameboundClient*)ofxSNOGet(mClient) lockClient];
            SyphonOpenGLClient *client = [(SyphonNameboundClient*)ofxSNOGet(mClient) client];
-           
+           // Fixme: check if(client==nullptr) ? (although already setup)
+
            ofxSNOSet(latestImage, [client newFrameImage]);
             if (latestImage)
             {
@@ -152,16 +154,19 @@ bool ofxSyphonClient::lockTexture()
             {
                 mTex.clear();
             }
+            bHasNewFrame = latestImage;
         }
+        return true;
     }
     else
     {
         ofLogError("ofxSyphonClient") << "ofxSyphonClient is not setup.  Cannot lock";
+        return false;
     }
     return latestImage;
 }
 
-void ofxSyphonClient::unlockTexture()
+bool ofxSyphonClient::unlockTexture()
 {
     if(bSetup)
     {
@@ -172,24 +177,30 @@ void ofxSyphonClient::unlockTexture()
                 latestImage = ofxSyphonNSObject();
             }
         }
+        return true;
     }
+    return false;
 }
 
-void ofxSyphonClient::bind()
+bool ofxSyphonClient::bind()
 {
     if (lockTexture())
     {
         mTex.bind();
+        return true;
     }
+    return false;
 }
 
-void ofxSyphonClient::unbind()
+bool ofxSyphonClient::unbind()
 {
     if (bSetup && latestImage)
     {
         mTex.unbind();
         unlockTexture();
+        return true;
     }
+	return false;
 }
 
 void ofxSyphonClient::draw(float x, float y, float w, float h)
@@ -261,4 +272,9 @@ ofTexture &ofxSyphonClient::getTexture()
         ofLogError("ofxSyphonClient") << "getTexture() called without call to lockTexture()";
     }
     return mTex;
+}
+
+bool ofxSyphonClient::isNewFrame() const
+{
+	return bHasNewFrame;
 }
